@@ -1,4 +1,4 @@
-package com.IoT.processor.controller;
+package com.iot.devicesimulator.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
