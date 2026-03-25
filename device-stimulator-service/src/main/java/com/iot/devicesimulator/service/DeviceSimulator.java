@@ -1,9 +1,12 @@
 package com.iot.devicesimulator.service;
 
+import com.IoT.commons.dto.SensorReading;
+import com.IoT.commons.model.NetworkType;
 import com.iot.devicesimulator.config.SimulatorConfig;
-import com.iot.devicesimulator.model.SensorReading;
-import com.iot.devicesimulator.scenario.NetworkType;
-import com.iot.devicesimulator.scenario.ScenarioType;
+import com.iot.devicesimulator.traffic.FleetGrowth;
+import com.iot.devicesimulator.traffic.RampTraffic;
+import com.iot.devicesimulator.traffic.SawtoothTraffic;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,6 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.IoT.commons.model.TrafficProfile;
+
+
 @Component
 public class DeviceSimulator {
 
@@ -26,18 +32,27 @@ public class DeviceSimulator {
     private final SimulatorConfig config;
     private final Counter sentCounter;
     private final Counter errorCounter;
+    @Getter
+    private final AtomicReference<TrafficProfile> trafficProfile;
 
-    // Mutable at runtime via REST endpoint (see SimulatorController)
-    private final AtomicReference<ScenarioType> currentScenario;
+    private final FleetGrowth fleetGrowth;
+    private final RampTraffic rampTraffic;
+    private final SawtoothTraffic sawtoothTraffic;
 
     public DeviceSimulator(RestTemplate restTemplate,
                            SimulatorConfig config,
-                           MeterRegistry registry) {
+                           MeterRegistry registry,
+                           FleetGrowth fleetGrowth,
+                           RampTraffic rampTraffic,
+                           SawtoothTraffic sawtoothTraffic) {
         this.restTemplate = restTemplate;
         this.config = config;
-        this.currentScenario = new AtomicReference<>(config.getScenario());
-        this.sentCounter  = registry.counter("simulator.readings.sent");
+        this.trafficProfile = new AtomicReference<>(config.getTrafficProfile());
+        this.sentCounter = registry.counter("simulator.readings.sent");
         this.errorCounter = registry.counter("simulator.readings.errors");
+        this.fleetGrowth = fleetGrowth;
+        this.rampTraffic = rampTraffic;
+        this.sawtoothTraffic = sawtoothTraffic;
     }
 
     /**
@@ -47,10 +62,11 @@ public class DeviceSimulator {
      */
     @Scheduled(fixedDelay = 500)
     public void emit() {
-        ScenarioType scenario = currentScenario.get();
-        int multiplier = burstMultiplier(scenario);
-        List<SensorReading> batch = buildBatch(multiplier);
-        System.out.println(batch);
+        List<SensorReading> batch = buildBatchForCurrentProfile();
+
+        System.out.println("Traffic Type: " + trafficProfile.get());
+        System.out.println("Batch size:"  + batch.size());
+
 
         sentCounter.increment(batch.size());
         /*
@@ -69,46 +85,38 @@ public class DeviceSimulator {
          */
     }
 
-    /**
-     * Builds one batch of readings spread across all 4 network types.
-     * multiplier controls how many devices "wake up" per tick.
-     */
-    private List<SensorReading> buildBatch(int multiplier) {
+    private List<SensorReading> buildBatchForCurrentProfile() {
+        return switch (trafficProfile.get()) {
+            case GRADUAL_RAMP -> buildBatch(rampTraffic.currentMultiplier(), config.getDevicesPerNetwork());
+            case SAWTOOTH -> buildBatch(sawtoothTraffic.currentMultiplier(), config.getDevicesPerNetwork());
+            case FLEET_GROWTH -> buildBatch(1, fleetGrowth.currentDeviceCount());
+            case BASELINE -> buildBatch(3, config.getDevicesPerNetwork());
+            case SUDDEN_SPIKE,
+                 CASCADE,
+                 SUSTAINED_MAX -> buildBatch(20, config.getDevicesPerNetwork());
+        };
+    }
+
+    private List<SensorReading> buildBatch(int multiplier, int devicesPerNetwork) {
         List<SensorReading> batch = new ArrayList<>();
+
         for (NetworkType type : NetworkType.values()) {
-            int count = Math.max(1, (config.getDevicesPerNetwork() / 10) * multiplier);
+            // How many devices of this type report per tick.
+            // Divide by 10 so at multiplier=1 only 10% of fleet reports
+            // each tick — realistic: not all devices fire simultaneously.
+            // Multiply by multiplier to simulate burst scenarios.
+            int count = Math.max(1, (devicesPerNetwork / 10) * multiplier);
+
             for (int i = 0; i < count; i++) {
                 batch.add(SensorReading.random(type));
             }
         }
+
         return batch;
     }
 
-    /**
-     * Burst multiplier — the key experimental variable.
-     *
-     * IDLE         = 1x  (baseline, very low traffic)
-     * RUSH_HOUR    = 10x (traffic + energy sensors spike)
-     * STORM_EVENT  = 5x  (environment sensors flood)
-     * SHIFT_CHANGE = 20x (industrial sensors burst hard)
-     * CASCADE      = 30x (all networks simultaneously — worst case)
-     */
-    private int burstMultiplier(ScenarioType scenario) {
-        return switch (scenario) {
-            case IDLE         -> 1;
-            case RUSH_HOUR    -> 10;
-            case STORM_EVENT  -> 5;
-            case SHIFT_CHANGE -> 20;
-            case CASCADE      -> 30;
-        };
+    public void setTrafficProfile(TrafficProfile trafficProfile) {
+        this.trafficProfile.set(trafficProfile);
     }
 
-    public void setScenario(ScenarioType scenario) {
-        log.info("Scenario changed: {} → {}", currentScenario.get(), scenario);
-        currentScenario.set(scenario);
-    }
-
-    public ScenarioType getCurrentScenario() {
-        return currentScenario.get();
-    }
 }

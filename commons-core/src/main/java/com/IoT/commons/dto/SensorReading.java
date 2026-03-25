@@ -1,6 +1,6 @@
-package com.iot.devicesimulator.model;
+package com.IoT.commons.dto;
 
-import com.iot.devicesimulator.scenario.NetworkType;
+import com.IoT.commons.model.NetworkType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,7 +23,7 @@ public class SensorReading {
     public static SensorReading random(NetworkType networkType) {
         return SensorReading.builder()
                 .deviceId(UUID.randomUUID().toString())
-                .value(ThreadLocalRandom.current().nextDouble(0, 100))
+                .value(ThreadLocalRandom.current().nextDouble(0, 5))
                 .timestamp(System.currentTimeMillis())
                 .networkType(networkType)
                 .build();

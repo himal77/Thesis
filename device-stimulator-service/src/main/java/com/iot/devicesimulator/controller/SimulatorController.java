@@ -1,10 +1,14 @@
 package com.iot.devicesimulator.controller;
 
-import com.iot.devicesimulator.scenario.ScenarioType;
+import com.IoT.commons.model.TrafficProfile;
 import com.iot.devicesimulator.service.DeviceSimulator;
+import com.iot.devicesimulator.traffic.FleetGrowth;
+import com.iot.devicesimulator.traffic.RampTraffic;
+import com.iot.devicesimulator.traffic.SawtoothTraffic;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -18,32 +22,54 @@ import java.util.Map;
 public class SimulatorController {
 
     private final DeviceSimulator simulator;
+    private final FleetGrowth fleetGrowth;
+    private final RampTraffic rampTraffic;
+    private final SawtoothTraffic sawtoothTraffic;
 
-    public SimulatorController(DeviceSimulator simulator) {
+    public SimulatorController(DeviceSimulator simulator,
+                               RampTraffic rampTraffic,
+                               SawtoothTraffic sawtoothTraffic,
+                               FleetGrowth fleetGrowth) {
         this.simulator = simulator;
+        this.fleetGrowth = fleetGrowth;
+        this.rampTraffic = rampTraffic;
+        this.sawtoothTraffic = sawtoothTraffic;
     }
 
     @GetMapping("/status")
-    public ResponseEntity<Map<String, String>> status() {
+    public ResponseEntity<?> status() {
         return ResponseEntity.ok(Map.of(
-                "scenario", simulator.getCurrentScenario().name(),
+                "scenario", simulator.getTrafficProfile().get(),
                 "status", "running"
         ));
     }
 
-    @PostMapping("/scenario")
-    public ResponseEntity<Map<String, String>> setScenario(@RequestBody Map<String, String> body) {
+    @PostMapping("/profile")
+    public ResponseEntity<?> setProfile(@RequestBody Map<String, String> body) {
+        // validate profile name before doing anything
+        TrafficProfile profile;
         try {
-            ScenarioType scenario = ScenarioType.valueOf(body.get("scenario").toUpperCase());
-            simulator.setScenario(scenario);
-            return ResponseEntity.ok(Map.of(
-                    "scenario", scenario.name(),
-                    "message", "Scenario updated successfully"
-            ));
-        } catch (IllegalArgumentException e) {
+            profile = TrafficProfile.valueOf(body.get("profile").toUpperCase());
+        } catch (IllegalArgumentException | NullPointerException e) {
             return ResponseEntity.badRequest().body(Map.of(
-                    "error", "Unknown scenario. Valid: IDLE, RUSH_HOUR, STORM_EVENT, SHIFT_CHANGE, CASCADE"
+                    "error", "Invalid profile. Valid values: " +
+                            Arrays.toString(TrafficProfile.values())
             ));
         }
+
+        rampTraffic.reset();
+        sawtoothTraffic.reset();
+        fleetGrowth.reset();
+
+        // start the right traffic generator
+        switch (profile) {
+            case GRADUAL_RAMP  -> rampTraffic.start();
+            case SAWTOOTH      -> sawtoothTraffic.start();
+            case FLEET_GROWTH  -> fleetGrowth.start();
+            default            -> {}  // stateless profiles need no start()
+        }
+
+        simulator.setTrafficProfile(profile);
+        return ResponseEntity.ok(Map.of("profile", profile.name()));
     }
 }

@@ -1,19 +1,21 @@
 package com.iot.devicesimulator.config;
 
-import com.iot.devicesimulator.scenario.ScenarioType;
+import com.IoT.commons.model.TrafficProfile;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
+@Getter
 @Configuration
 public class SimulatorConfig {
 
-    @Value("${simulator.scenario:IDLE}")
-    private ScenarioType scenario;
-
     @Value("${simulator.devices-per-network:100}")
     private int devicesPerNetwork;
+
+    @Value("${simulator.current-traffic-profile:GRADUAL_RAMP}")
+    private TrafficProfile trafficProfile;
 
     @Value("${ingestor.url:http://localhost:8081}")
     private String ingestorUrl;
@@ -23,7 +25,4 @@ public class SimulatorConfig {
         return new RestTemplate();
     }
 
-    public ScenarioType getScenario() { return scenario; }
-    public int getDevicesPerNetwork() { return devicesPerNetwork; }
-    public String getIngestorUrl() { return ingestorUrl; }
 }
