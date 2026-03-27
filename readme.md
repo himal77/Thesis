@@ -33,3 +33,10 @@
 │  │           Prometheus + Grafana + metrics-server      │   │
 │  └──────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
+
+
+Dashboard:
+https://grafana.com/grafana/dashboards/22913-springboot-apm/
+https://grafana.com/grafana/dashboards/12900-springboot-apm-dashboard/
+https://grafana.com/grafana/dashboards/24605-kubernetes-deployment-pods-springboot/
+https://grafana.com/grafana/dashboards
