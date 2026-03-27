@@ -1,4 +1,4 @@
-package com.IoT.alert;
+package com.iot.alert.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

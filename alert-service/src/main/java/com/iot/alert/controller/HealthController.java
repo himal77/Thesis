@@ -1,4 +1,4 @@
-package com.IoT.alert.controller;
+package com.iot.alert.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

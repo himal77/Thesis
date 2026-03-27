@@ -1,11 +1,11 @@
-package com.IoT.alert.controller;
+package com.iot.alert.controller;
 
-import com.IoT.alert.AlertEntity;
-import com.IoT.alert.AlertRepository;
-import com.IoT.alert.AlertRuleEvaluator;
-import com.IoT.alert.DeviceStateManager;
-import com.IoT.commons.dto.AlertDto;
-import com.IoT.commons.dto.ProcessedReading;
+import com.iot.alert.entity.AlertEntity;
+import com.iot.alert.repository.AlertRepository;
+import com.iot.alert.AlertRuleEvaluator;
+import com.iot.alert.DeviceStateManager;
+import com.iot.commons.dto.AlertDto;
+import com.iot.commons.dto.ProcessedReading;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.http.ResponseEntity;

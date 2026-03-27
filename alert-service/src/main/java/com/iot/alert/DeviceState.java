@@ -1,4 +1,4 @@
-package com.IoT.alert;
+package com.iot.alert;
 
 import java.time.Instant;
 import java.util.ArrayDeque;

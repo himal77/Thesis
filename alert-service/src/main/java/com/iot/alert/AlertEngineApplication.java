@@ -1,4 +1,4 @@
-package com.IoT.alert;
+package com.iot.alert;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

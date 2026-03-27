@@ -1,7 +1,8 @@
-package com.IoT.alert;
+package com.iot.alert;
 
-import com.IoT.commons.dto.AlertDto;
-import com.IoT.commons.dto.ProcessedReading;
+import com.iot.alert.config.AlertEngineConfig;
+import com.iot.commons.dto.AlertDto;
+import com.iot.commons.dto.ProcessedReading;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -19,7 +20,7 @@ import java.util.Optional;
 @Component
 public class AlertRuleEvaluator {
 
-    private final AlertEngineConfig  config;
+    private final AlertEngineConfig config;
     private final DeviceStateManager stateManager;
 
     public AlertRuleEvaluator(AlertEngineConfig config,

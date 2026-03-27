@@ -1,5 +1,6 @@
-package com.IoT.alert;
+package com.iot.alert;
 
+import com.iot.alert.config.AlertEngineConfig;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
