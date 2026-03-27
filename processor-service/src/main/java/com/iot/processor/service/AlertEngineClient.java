@@ -36,7 +36,7 @@ public class AlertEngineClient {
         } catch (RestClientException e) {
             // non-fatal — log and continue
             log.warn("Alert-engine unreachable for device {}: {}",
-                    reading.getOriginal().getDeviceId(), e.getMessage());
+                    reading.getSensorReading().getDeviceId(), e.getMessage());
         }
     }
 }

@@ -1,8 +1,11 @@
 package com.iot.alert.config;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
+@Getter
 @Configuration
 public class AlertEngineConfig {
 
@@ -19,7 +22,4 @@ public class AlertEngineConfig {
     @Value("${alert.cooldown-seconds:60}")
     private int cooldownSeconds;
 
-    public int getConsecutiveThreshold() { return consecutiveThreshold; }
-    public int getHistorySize()          { return historySize; }
-    public int getCooldownSeconds()      { return cooldownSeconds; }
 }

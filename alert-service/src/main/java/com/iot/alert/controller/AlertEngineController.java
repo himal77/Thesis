@@ -101,12 +101,12 @@ public class AlertEngineController {
     private AlertEntity toEntity(AlertDto dto) {
         AlertEntity e = new AlertEntity();
         e.setDeviceId(dto.getDeviceId());
-        // e.setNetworkType(dto.getNetworkType());
+        e.setNetworkType(dto.getNetworkType());
         e.setMessage(dto.getMessage());
-        // e.setSeverity(dto.getSeverity());
+        e.setCategory(dto.getCategory());
         e.setZScore(dto.getZScore());
         e.setValue(dto.getValue());
-        // e.setTriggeredAt(dto.getTriggeredAt());
+        e.setTriggeredAt(dto.getTriggeredAt());
         return e;
     }
 }

@@ -12,7 +12,7 @@ public interface AlertRepository extends JpaRepository<AlertEntity, Long> {
 
     List<AlertEntity> findByDeviceIdOrderByTriggeredAtDesc(String deviceId);
 
-    List<AlertEntity> findBySeverityAndTriggeredAtAfter(String severity, Instant since);
+    List<AlertEntity> findByCategoryAndTriggeredAtAfter(String severity, Instant since);
 
     List<AlertEntity> findByTriggeredAtAfterOrderByTriggeredAtDesc(Instant since);
 

@@ -109,14 +109,14 @@ public class ProcessorController {
 
     private ReadingEntity toEntity(ProcessedReading r) {
         ReadingEntity e = new ReadingEntity();
-        e.setDeviceId(r.getOriginal().getDeviceId());
-        e.setNetworkType(r.getOriginal().getNetworkType());
-        e.setValue(r.getOriginal().getValue());
+        e.setDeviceId(r.getSensorReading().getDeviceId());
+        e.setNetworkType(r.getSensorReading().getNetworkType());
+        e.setValue(r.getSensorReading().getValue());
         e.setZScore(r.getZScore());
         e.setNormalized(r.getNormalized());
         e.setCategory(r.getCategory());
         e.setAnomaly(r.isAnomaly());
-        e.setTimestamp(Instant.ofEpochSecond(r.getOriginal().getTimestamp()));
+        e.setTimestamp(Instant.ofEpochSecond(r.getSensorReading().getTimestamp()));
         e.setProcessedAt(r.getProcessedAt());
         return e;
     }

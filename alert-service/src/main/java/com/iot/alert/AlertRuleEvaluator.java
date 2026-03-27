@@ -1,6 +1,7 @@
 package com.iot.alert;
 
 import com.iot.alert.config.AlertEngineConfig;
+import com.iot.alert.entity.AlertEntity;
 import com.iot.commons.dto.AlertDto;
 import com.iot.commons.dto.ProcessedReading;
 import org.springframework.stereotype.Component;
@@ -35,7 +36,7 @@ public class AlertRuleEvaluator {
      */
     public Optional<AlertDto> evaluate(ProcessedReading reading) {
         DeviceState state = stateManager.getOrCreate(
-                reading.getOriginal().getDeviceId()
+                reading.getSensorReading().getDeviceId()
         );
 
         // update history regardless
@@ -78,18 +79,19 @@ public class AlertRuleEvaluator {
     private AlertDto buildAlert(ProcessedReading reading, DeviceState state) {
         String message = String.format(
                 "Device %s reported %s readings with |zScore|=%.2f",
-                reading.getOriginal().getDeviceId(),
+                reading.getSensorReading().getDeviceId(),
                 config.getConsecutiveThreshold(),
                 reading.getZScore()
         );
 
-        return new AlertDto(
-                reading.getOriginal().getDeviceId(),
-                reading.getOriginal().getNetworkType().name(),
-                message,
-                reading.getCategory(),
-                reading.getZScore(),
-                reading.getOriginal().getValue()
-        );
+        return AlertDto.builder()
+                .deviceId(reading.getSensorReading().getDeviceId())
+                .networkType(reading.getSensorReading().getNetworkType())
+                .message(message)
+                .category(reading.getCategory())
+                .zScore(reading.getZScore())
+                .value(reading.getSensorReading().getValue())
+                .triggeredAt(Instant.now())
+                .build();
     }
 }

@@ -1,5 +1,10 @@
 package com.iot.alert;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -22,6 +27,9 @@ import java.util.Deque;
  * forcing this map to expand and memory to climb — exactly what
  * VPA's recommender watches and adjusts requests.memory for.
  */
+@Setter
+@Getter
+@AllArgsConstructor
 public class DeviceState {
 
     private final String        deviceId;
@@ -43,12 +51,4 @@ public class DeviceState {
 
     public void incrementConsecutiveAnomalies() { consecutiveAnomalies++; }
     public void resetConsecutiveAnomalies()     { consecutiveAnomalies = 0; }
-    public int  getConsecutiveAnomalies()       { return consecutiveAnomalies; }
-
-    public Instant getLastAlertAt()             { return lastAlertAt; }
-    public void    setLastAlertAt(Instant t)    { this.lastAlertAt = t; }
-
-    public String        getDeviceId()          { return deviceId; }
-    public Deque<Double> getHistory()           { return history; }
-    public int           getHistorySize()       { return history.size(); }
 }

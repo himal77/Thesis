@@ -23,7 +23,7 @@ import java.time.Instant;
 @NoArgsConstructor
 public class ProcessedReading {
 
-    private SensorReading original;
+    private SensorReading sensorReading;
     private double zScore;       // how many std devs from mean
     private String category;     // LOW / MEDIUM / HIGH / CRITICAL
     private double normalized;   // value scaled between 0.0 and 1.0
