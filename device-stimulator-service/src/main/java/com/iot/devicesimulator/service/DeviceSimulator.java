@@ -1,7 +1,7 @@
 package com.iot.devicesimulator.service;
 
-import com.IoT.commons.dto.SensorReading;
-import com.IoT.commons.model.NetworkType;
+import com.iot.commons.dto.SensorReading;
+import com.iot.commons.model.NetworkType;
 import com.iot.devicesimulator.config.SimulatorConfig;
 import com.iot.devicesimulator.traffic.FleetGrowth;
 import com.iot.devicesimulator.traffic.RampTraffic;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.IoT.commons.model.TrafficProfile;
+import com.iot.commons.model.TrafficProfile;
 
 
 @Component

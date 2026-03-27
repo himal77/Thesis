@@ -1,4 +1,4 @@
-package com.IoT.commons.model;
+package com.iot.commons.model;
 
 public enum TrafficProfile {
     BASELINE,

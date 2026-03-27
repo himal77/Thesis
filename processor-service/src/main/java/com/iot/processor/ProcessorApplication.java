@@ -1,12 +1,12 @@
-package com.IoT.alert;
+package com.iot.processor;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AlertApplication {
+public class ProcessorApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(AlertApplication.class, args);
+		SpringApplication.run(ProcessorApplication.class, args);
 	}
 }

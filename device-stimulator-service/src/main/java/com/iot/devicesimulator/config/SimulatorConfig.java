@@ -1,6 +1,6 @@
 package com.iot.devicesimulator.config;
 
-import com.IoT.commons.model.TrafficProfile;
+import com.iot.commons.model.TrafficProfile;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

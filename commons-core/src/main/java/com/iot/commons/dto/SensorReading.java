@@ -1,18 +1,16 @@
-package com.IoT.commons.dto;
+package com.iot.commons.dto;
 
-import com.IoT.commons.model.NetworkType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.iot.commons.model.NetworkType;
+import lombok.*;
 
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
-@Data
+@Builder
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class SensorReading {
 
     private String deviceId;

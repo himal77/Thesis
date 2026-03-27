@@ -1,4 +1,4 @@
-package com.IoT.commons.dto;
+package com.iot.commons.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import java.time.Instant;
  * Output of processor-service.
  * Sent to alert-engine for state evaluation.
  * Also written to PostgreSQL for historical queries.
- *
+ * <p>
  * --- Thesis relevance ---
  * zScore is the CPU-heavy computation that makes processor-service
  * CPU bound. Computing it across a sliding window of 100 readings

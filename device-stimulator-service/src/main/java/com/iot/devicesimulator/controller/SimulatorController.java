@@ -1,6 +1,6 @@
 package com.iot.devicesimulator.controller;
 
-import com.IoT.commons.model.TrafficProfile;
+import com.iot.commons.model.TrafficProfile;
 import com.iot.devicesimulator.service.DeviceSimulator;
 import com.iot.devicesimulator.traffic.FleetGrowth;
 import com.iot.devicesimulator.traffic.RampTraffic;
