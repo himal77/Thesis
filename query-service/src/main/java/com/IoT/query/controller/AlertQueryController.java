@@ -81,10 +81,10 @@ public class AlertQueryController {
 
         return ResponseEntity.ok(Map.of(
                 "total",    repository.countByTriggeredAtAfter(since),
-                "critical", repository.countBySeverityAndTriggeredAtAfter("CRITICAL", since),
-                "high",     repository.countBySeverityAndTriggeredAtAfter("HIGH", since),
-                "medium",   repository.countBySeverityAndTriggeredAtAfter("MEDIUM", since),
-                "low",      repository.countBySeverityAndTriggeredAtAfter("LOW", since),
+                "critical", repository.countByCategoryAndTriggeredAtAfter("CRITICAL", since),
+                "high",     repository.countByCategoryAndTriggeredAtAfter("HIGH", since),
+                "medium",   repository.countByCategoryAndTriggeredAtAfter("MEDIUM", since),
+                "low",      repository.countByCategoryAndTriggeredAtAfter("LOW", since),
                 "windowMinutes", minutes
         ));
     }

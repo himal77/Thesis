@@ -1,5 +1,6 @@
 package com.IoT.query.entity;
 
+import com.iot.commons.model.NetworkType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,12 +17,13 @@ import java.time.Instant;
 public class AlertEntity {
 
     @Id
-    private Long id;
-    private String deviceId;
-    private String networkType;
-    private String message;
-    private String severity;
-    private double zScore;
-    private double value;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long    id;
+    private String  deviceId;
+    private NetworkType networkType;
+    private String  message;
+    private String  category;
+    private double  zScore;
+    private double  value;
     private Instant triggeredAt;
 }

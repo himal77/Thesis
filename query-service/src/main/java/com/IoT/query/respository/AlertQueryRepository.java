@@ -20,11 +20,11 @@ public interface AlertQueryRepository
             String deviceId, Instant since
     );
 
-    List<AlertEntity> findBySeverityAndTriggeredAtAfter(
+    List<AlertEntity> findByCategoryAndTriggeredAtAfter(
             String severity, Instant since
     );
 
     long countByTriggeredAtAfter(Instant since);
 
-    long countBySeverityAndTriggeredAtAfter(String severity, Instant since);
+    long countByCategoryAndTriggeredAtAfter(String severity, Instant since);
 }

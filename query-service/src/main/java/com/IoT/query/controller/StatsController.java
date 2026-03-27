@@ -45,7 +45,7 @@ public class StatsController {
         long totalReadings = readingRepo.countByTimestampAfter(since);
         long anomalies     = readingRepo.countByAnomalyTrueAndTimestampAfter(since);
         long totalAlerts   = alertRepo.countByTriggeredAtAfter(since);
-        long critAlerts    = alertRepo.countBySeverityAndTriggeredAtAfter("CRITICAL", since);
+        long critAlerts    = alertRepo.countByCategoryAndTriggeredAtAfter("CRITICAL", since);
         Double avgZ        = readingRepo.avgZScoreSince(since);
 
         return ResponseEntity.ok(Map.of(
