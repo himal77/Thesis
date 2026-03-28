@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import io.micrometer.core.instrument.Counter;
 
@@ -69,7 +70,7 @@ public class DeviceSimulator {
 
 
         sentCounter.increment(batch.size());
-        /*
+
         try {
             restTemplate.postForEntity(
                     config.getIngestorUrl() + "/api/ingest",
@@ -77,12 +78,12 @@ public class DeviceSimulator {
                     Void.class
             );
             sentCounter.increment(batch.size());
-            log.debug("Emitted {} readings [scenario={}]", batch.size(), scenario);
+            log.debug("Emitted {} readings [batch={}]", batch.size(), batch);
         } catch (RestClientException e) {
             errorCounter.increment();
             log.warn("Failed to send batch: {}", e.getMessage());
         }
-         */
+
     }
 
     private List<SensorReading> buildBatchForCurrentProfile() {

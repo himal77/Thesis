@@ -1,4 +1,4 @@
-package com.IoT.ingestor.controller;
+package com.iot.ingestor.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,4 +1,4 @@
-package com.IoT.ingestor;
+package com.iot.ingestor;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
