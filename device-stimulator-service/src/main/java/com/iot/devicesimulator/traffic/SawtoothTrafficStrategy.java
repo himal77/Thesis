@@ -26,10 +26,12 @@ public class SawtoothTrafficStrategy implements TrafficStrategy {
         this.simulatorConfig = simulatorConfig;
     }
 
+    @Override
     public void start() {
         this.rampStart = Instant.now();
     }
 
+    @Override
     public void reset() {
         this.rampStart = null;
     }

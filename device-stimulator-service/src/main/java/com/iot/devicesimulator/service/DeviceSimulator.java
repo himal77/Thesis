@@ -2,7 +2,7 @@ package com.iot.devicesimulator.service;
 
 import com.iot.commons.dto.SensorReading;
 import com.iot.commons.model.TrafficProfile;
-import com.iot.devicesimulator.config.BeanFactory;
+import com.iot.devicesimulator.config.TrafficRegistryFactory;
 import com.iot.devicesimulator.config.SimulatorConfig;
 import com.iot.devicesimulator.traffic.*;
 import io.micrometer.core.instrument.Counter;
@@ -29,7 +29,7 @@ public class DeviceSimulator {
     private final SimulatorConfig config;
     private final Counter sentCounter;
     private final Counter errorCounter;
-    private final BeanFactory beanFactory;
+    private final TrafficRegistryFactory trafficRegistryFactory;
     private AtomicReference<TrafficStrategy> trafficStrategyAR;
 
     @Getter
@@ -38,14 +38,14 @@ public class DeviceSimulator {
     public DeviceSimulator(RestTemplate restTemplate,
                            SimulatorConfig config,
                            MeterRegistry registry,
-                           BeanFactory beanFactory) {
+                           TrafficRegistryFactory trafficRegistryFactory) {
         this.restTemplate = restTemplate;
         this.config = config;
         this.trafficProfile = new AtomicReference<>(config.getTrafficProfile());
         this.sentCounter = registry.counter("simulator.readings.sent");
         this.errorCounter = registry.counter("simulator.readings.errors");
-        this.beanFactory = beanFactory;
-        trafficStrategyAR = new AtomicReference<>(beanFactory.get(TrafficProfile.HOLD));
+        this.trafficRegistryFactory = trafficRegistryFactory;
+        trafficStrategyAR = new AtomicReference<>(trafficRegistryFactory.get(TrafficProfile.HOLD));
     }
 
     @Scheduled(fixedDelay = 500)
@@ -71,6 +71,6 @@ public class DeviceSimulator {
 
     public void setTrafficProfile(TrafficProfile trafficProfile) {
         this.trafficProfile.set(trafficProfile);
-        trafficStrategyAR.set(beanFactory.get(trafficProfile));
+        trafficStrategyAR.set(trafficRegistryFactory.get(trafficProfile));
     }
 }

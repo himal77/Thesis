@@ -22,10 +22,12 @@ public class GradualRampTrafficStrategy implements TrafficStrategy {
         this.simulatorConfig = simulatorConfig;
     }
 
+    @Override
     public void start() {
         this.rampStartTime = Instant.now();
     }
 
+    @Override
     public void reset() {
         this.rampStartTime = null;
     }

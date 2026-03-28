@@ -1,9 +1,8 @@
 package com.iot.devicesimulator.controller;
 
 import com.iot.commons.model.TrafficProfile;
-import com.iot.devicesimulator.config.BeanFactory;
+import com.iot.devicesimulator.config.TrafficRegistryFactory;
 import com.iot.devicesimulator.service.DeviceSimulator;
-import com.iot.devicesimulator.traffic.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,12 +20,12 @@ import java.util.Map;
 public class SimulatorController {
 
     private final DeviceSimulator deviceSimulator;
-    private final BeanFactory beanFactory;
+    private final TrafficRegistryFactory trafficRegistryFactory;
 
     public SimulatorController(DeviceSimulator deviceSimulator,
-                               BeanFactory beanFactory) {
+                               TrafficRegistryFactory trafficRegistryFactory) {
         this.deviceSimulator = deviceSimulator;
-        this.beanFactory = beanFactory;
+        this.trafficRegistryFactory = trafficRegistryFactory;
     }
 
     @GetMapping("/status")
@@ -50,19 +49,10 @@ public class SimulatorController {
             ));
         }
 
-        beanFactory.getGradualRampTraffic().reset();
-        beanFactory.getSawtoothTraffic().reset();
-        beanFactory.getFleetGrowthTraffic().reset();
-
-        // start the right traffic generator
-        switch (profile) {
-            case GRADUAL_RAMP  -> beanFactory.getGradualRampTraffic().start();
-            case SAWTOOTH      -> beanFactory.getSawtoothTraffic().start();
-            case FLEET_GROWTH  -> beanFactory.getFleetGrowthTraffic().start();
-            default            -> {}  // stateless profiles need no start()
-        }
-
+        trafficRegistryFactory.resetTimer();
+        trafficRegistryFactory.startTimer();
         deviceSimulator.setTrafficProfile(profile);
+
         return ResponseEntity.ok(Map.of("profile", profile.name()));
     }
 }

@@ -18,10 +18,12 @@ public class FleetGrowthTrafficStrategy implements TrafficStrategy {
 
     private Instant rampStart;
 
+    @Override
     public void start() {
         this.rampStart = Instant.now();
     }
 
+    @Override
     public void reset() {
         this.rampStart = null;
     }

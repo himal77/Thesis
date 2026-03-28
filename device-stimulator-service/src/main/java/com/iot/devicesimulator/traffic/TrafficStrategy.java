@@ -22,4 +22,10 @@ public interface TrafficStrategy {
     }
 
     TrafficProfile getType();
+
+    default void reset() {
+    }
+
+    default void start() {
+    }
 }
