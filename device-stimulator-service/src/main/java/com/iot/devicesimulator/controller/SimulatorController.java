@@ -1,10 +1,9 @@
 package com.iot.devicesimulator.controller;
 
 import com.iot.commons.model.TrafficProfile;
+import com.iot.devicesimulator.config.BeanFactory;
 import com.iot.devicesimulator.service.DeviceSimulator;
-import com.iot.devicesimulator.traffic.FleetGrowth;
-import com.iot.devicesimulator.traffic.RampTraffic;
-import com.iot.devicesimulator.traffic.SawtoothTraffic;
+import com.iot.devicesimulator.traffic.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,25 +20,19 @@ import java.util.Map;
 @RequestMapping("/api")
 public class SimulatorController {
 
-    private final DeviceSimulator simulator;
-    private final FleetGrowth fleetGrowth;
-    private final RampTraffic rampTraffic;
-    private final SawtoothTraffic sawtoothTraffic;
+    private final DeviceSimulator deviceSimulator;
+    private final BeanFactory beanFactory;
 
-    public SimulatorController(DeviceSimulator simulator,
-                               RampTraffic rampTraffic,
-                               SawtoothTraffic sawtoothTraffic,
-                               FleetGrowth fleetGrowth) {
-        this.simulator = simulator;
-        this.fleetGrowth = fleetGrowth;
-        this.rampTraffic = rampTraffic;
-        this.sawtoothTraffic = sawtoothTraffic;
+    public SimulatorController(DeviceSimulator deviceSimulator,
+                               BeanFactory beanFactory) {
+        this.deviceSimulator = deviceSimulator;
+        this.beanFactory = beanFactory;
     }
 
     @GetMapping("/status")
     public ResponseEntity<?> status() {
         return ResponseEntity.ok(Map.of(
-                "scenario", simulator.getTrafficProfile().get(),
+                "scenario", deviceSimulator.getTrafficProfile().get(),
                 "status", "running"
         ));
     }
@@ -57,19 +50,19 @@ public class SimulatorController {
             ));
         }
 
-        rampTraffic.reset();
-        sawtoothTraffic.reset();
-        fleetGrowth.reset();
+        beanFactory.getGradualRampTraffic().reset();
+        beanFactory.getSawtoothTraffic().reset();
+        beanFactory.getFleetGrowthTraffic().reset();
 
         // start the right traffic generator
         switch (profile) {
-            case GRADUAL_RAMP  -> rampTraffic.start();
-            case SAWTOOTH      -> sawtoothTraffic.start();
-            case FLEET_GROWTH  -> fleetGrowth.start();
+            case GRADUAL_RAMP  -> beanFactory.getGradualRampTraffic().start();
+            case SAWTOOTH      -> beanFactory.getSawtoothTraffic().start();
+            case FLEET_GROWTH  -> beanFactory.getFleetGrowthTraffic().start();
             default            -> {}  // stateless profiles need no start()
         }
 
-        simulator.setTrafficProfile(profile);
+        deviceSimulator.setTrafficProfile(profile);
         return ResponseEntity.ok(Map.of("profile", profile.name()));
     }
 }

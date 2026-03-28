@@ -6,6 +6,5 @@ public enum TrafficProfile {
     SAWTOOTH,
     FLEET_GROWTH,
     SUDDEN_SPIKE,
-    SUSTAINED_MAX,
-    CASCADE
+    HOLD
 }

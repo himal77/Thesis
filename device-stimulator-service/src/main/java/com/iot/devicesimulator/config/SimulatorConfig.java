@@ -11,10 +11,10 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class SimulatorConfig {
 
-    @Value("${simulator.devices-per-network:100}")
+    @Value("${simulator.devices-per-network:10}")
     private int devicesPerNetwork;
 
-    @Value("${simulator.current-traffic-profile:GRADUAL_RAMP}")
+    @Value("${simulator.current-traffic-profile:HOLD}")
     private TrafficProfile trafficProfile;
 
     @Value("${ingestor.url:http://localhost:8081}")
