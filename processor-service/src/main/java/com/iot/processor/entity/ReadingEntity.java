@@ -21,15 +21,15 @@ public class ReadingEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String      deviceId;
+    private String deviceId;
 
     @Enumerated(EnumType.STRING)
     private NetworkType networkType;
 
-    private double  value;
-    private double  zScore;
-    private double  normalized;
-    private String  category;
+    private double value;
+    private double zScore;
+    private double normalized;
+    private String category;
     private boolean anomaly;
     private Instant timestamp;
     private Instant processedAt;

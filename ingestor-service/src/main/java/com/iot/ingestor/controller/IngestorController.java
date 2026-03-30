@@ -127,7 +127,13 @@ public class IngestorController {
         return ResponseEntity.ok(Map.of(
                 "maxBatchSize", config.getMaxBatchSize(),
                 "processorUrl", config.getProcessorUrl(),
-                "status", "running"
+                "status", "running",
+                "receivedCounter", metrics.receivedCounter,
+                "forwardedCounter", metrics.forwardedCounter,
+                "invalidCounter", metrics.invalidCounter,
+                "failedCounter", metrics.failedCounter,
+                "forwardTimer", metrics.forwardTimer,
+                "batchProcessTimer", metrics.batchProcessTimer
         ));
     }
 

@@ -15,8 +15,8 @@ public class IngestorConfig {
     private String processorUrl;
 
     // Max batch size accepted per request
-    // Requests exceeding this are rejected with 400
-    @Value("${ingestor.max-batch-size:500}")
+    // Requests exceeding this are rejected with 500
+    @Value("${ingestor.max-batch-size:5000}")
     private int maxBatchSize;
 
     @Bean

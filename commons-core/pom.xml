@@ -6,8 +6,17 @@
         <groupId>com.iot</groupId>
         <artifactId>commons-parent</artifactId>
         <version>1.0.0</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>commons-core</artifactId>
     <packaging>jar</packaging>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>

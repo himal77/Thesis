@@ -13,6 +13,11 @@
     <version>1.0.0</version>
     <packaging>pom</packaging>
 
+    <modules>
+        <module>commons-core</module>
+        <module>device-stimulator-service</module>
+    </modules>
+
     <properties>
         <java.version>21</java.version>
         <lombok.version>1.18.44</lombok.version>
@@ -48,6 +53,28 @@
     </dependencies>
 
     <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+
+                <configuration>
+                    <!-- Java version -->
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+
+                    <!-- Enable annotation processing -->
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+        </plugins>
+
         <pluginManagement>
             <plugins>
                 <plugin>
