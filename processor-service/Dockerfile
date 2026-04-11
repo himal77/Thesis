@@ -4,7 +4,7 @@ FROM maven:3.9-eclipse-temurin-21 AS builder
 WORKDIR /build
 
 # Copy entire project (needed for commons-core)
-COPY .. .
+COPY . .
 
 # Build only processor-service + required modules
 RUN mvn -pl processor-service -am clean package -DskipTests
