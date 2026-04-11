@@ -1,0 +1,31 @@
+# .dockerignore
+# Keeps the Docker build context small — only source + POMs are needed.
+
+# Build outputs (the Dockerfile runs Maven itself)
+**/target/
+
+# IDE and OS noise
+.idea/
+*.iml
+.DS_Store
+**/.DS_Store
+
+# Git
+.git/
+.gitignore
+
+# Local k8s / experiment files (not needed in the image)
+k8s/
+monitoring/
+experiments/
+results/
+
+# Docker files themselves
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+target/
+.git
+node_modules
+readme.md

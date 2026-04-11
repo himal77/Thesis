@@ -16,6 +16,10 @@
     <modules>
         <module>commons-core</module>
         <module>device-stimulator-service</module>
+        <module>ingestor-service</module>
+        <module>processor-service</module>
+        <module>alert-service</module>
+        <module>query-service</module>
     </modules>
 
     <properties>
