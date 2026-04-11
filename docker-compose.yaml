@@ -23,7 +23,7 @@ services:
       - "--storage.tsdb.path=/prometheus"
       - "--web.enable-lifecycle"           # allows POST /-/reload
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
     ports:
       - "9090:9090"                        # http://localhost:9090
@@ -41,7 +41,7 @@ services:
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
       - GF_AUTH_DISABLE_LOGIN_FORM=true
     volumes:
-      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
       - grafana-data:/var/lib/grafana
     ports:
       - "3000:3000"                        # http://localhost:3000
@@ -63,6 +63,17 @@ services:
       SPRING_CLOUD_CONFIG_SERVER_GIT_FORCE_PULL: "true"
       SPRING_CLOUD_CONFIG_SERVER_GIT_SEARCH_PATHS: '{application}'
     restart: unless-stopped
+
+  processor-service:
+    image: himal77/processor-service:latest
+    container_name: processor-service
+    ports:
+      - "8080:8080"
+    env_file:
+      - env/.env-test-processor-service
+    depends_on:
+      - config-server
+
 
 networks:
   observability-net:
