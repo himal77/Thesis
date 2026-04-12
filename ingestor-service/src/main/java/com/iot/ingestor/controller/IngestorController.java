@@ -108,7 +108,7 @@ public class IngestorController {
                 "invalidData", metrics.invalidCounter.count(),
                 "forwardFailedData", metrics.failedCounter.count(),
                 "averageForwardTime", metrics.forwardTimer.mean(TimeUnit.MICROSECONDS),
-                "averageBatchProcessTime", metrics.forwardTimer.mean(TimeUnit.MICROSECONDS)
+                "averageBatchProcessTime", metrics.batchProcessTimer.mean(TimeUnit.MICROSECONDS)
         ));
     }
 
