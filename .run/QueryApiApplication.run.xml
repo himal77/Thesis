@@ -1,7 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="QueryApiApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
     <envs>
-      <env name="SPRING_APPLICATION_NAME" value="query-service" />
       <env name="SPRING_PROFILES_ACTIVE" value="dev" />
       <env name="SPRING_CONFIG_IMPORT" value="configserver:http://localhost:8888" />
     </envs>
