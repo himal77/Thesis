@@ -1,0 +1,89 @@
+services:
+  config-server:
+    image: springcloud/configserver:latest
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    environment:
+      SPRING_PROFILES_ACTIVE: git
+      SPRING_CLOUD_CONFIG_SERVER_GIT_URI: https://github.com/himal77/iot-config-repo
+      SPRING_CLOUD_CONFIG_SERVER_GIT_DEFAULT_LABEL: main
+      SPRING_CLOUD_CONFIG_SERVER_GIT_CLONE_ON_START: "true"
+      SPRING_CLOUD_CONFIG_SERVER_GIT_FORCE_PULL: "true"
+      SPRING_CLOUD_CONFIG_SERVER_GIT_SEARCH_PATHS: '{application}'
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: iot
+      POSTGRES_PASSWORD: iot
+      POSTGRES_DB: iot
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - iot-net
+
+  grafana:
+    image: grafana/grafana:10.4.2
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    volumes:
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"                        # http://localhost:3000
+    depends_on:
+      - prometheus
+    networks:
+      - iot-net
+
+  prometheus:
+    image: prom/prometheus:v2.51.2
+    container_name: prometheus
+    restart: unless-stopped
+    command:
+      - |
+        envsubst < /etc/prometheus/prometheus.template.yml \
+                 > /etc/prometheus/prometheus.yml &&
+        prometheus \
+          --config.file=/etc/prometheus/prometheus.yml \
+          --storage.tsdb.path=/prometheus \
+          --web.enable-lifecycle           # allows POST /-/reload
+    environment:
+      - ENV=${ENV}
+      - INGESTOR_HOST=${INGESTOR_HOST}
+      - INGESTOR_PORT=${INGESTOR_PORT}
+      - PROCESSOR_HOST=${PROCESSOR_HOST}
+      - PROCESSOR_PORT=${PROCESSOR_PORT}
+      - ALERT_HOST=${ALERT_HOST}
+      - ALERT_PORT=${ALERT_PORT}
+      - QUERY_HOST=${QUERY_HOST}
+      - QUERY_PORT=${QUERY_PORT}
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"                        # http://localhost:9090
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # lets Prometheus reach localhost services on ALL OSes
+    networks:
+      - iot-net
+
+networks:
+  iot-net:
+    name: iot-net              # fixed name so every service can reference it
+    driver: bridge
+
+volumes:
+  postgres_data:
+  prometheus-data:
+  grafana-data:

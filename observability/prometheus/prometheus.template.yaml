@@ -1,24 +1,16 @@
 global:
-  scrape_interval:     5s
+  scrape_interval: 5s
   evaluation_interval: 5s
   external_labels:
     project: iot
-    env: dev
+    env: ${ENV}
 
 scrape_configs:
-
-  - job_name: "alert-service"
-    metrics_path: "/actuator/prometheus"
-    static_configs:
-      - targets: [ 'host.docker.internal:8083' ]
-    relabel_configs:
-      - target_label: application
-        replacement: alert-service
 
   - job_name: "ingestor-service"
     metrics_path: "/actuator/prometheus"
     static_configs:
-      - targets: [ 'host.docker.internal:8081' ]
+      - targets: ['${INGESTOR_HOST}:${INGESTOR_PORT}']
     relabel_configs:
       - target_label: application
         replacement: ingestor-service
@@ -26,15 +18,23 @@ scrape_configs:
   - job_name: "processor-service"
     metrics_path: "/actuator/prometheus"
     static_configs:
-      - targets: ['host.docker.internal:8082']
+      - targets: ['${PROCESSOR_HOST}:${PROCESSOR_PORT}']
     relabel_configs:
       - target_label: application
         replacement: processor-service
 
+  - job_name: "alert-service"
+    metrics_path: "/actuator/prometheus"
+    static_configs:
+      - targets: ['${ALERT_HOST}:${ALERT_PORT}']
+    relabel_configs:
+      - target_label: application
+        replacement: alert-service
+
   - job_name: "query-service"
     metrics_path: "/actuator/prometheus"
     static_configs:
-      - targets: [ 'host.docker.internal:8084' ]
+      - targets: ['${QUERY_HOST}:${QUERY_PORT}']
     relabel_configs:
       - target_label: application
         replacement: query-service
