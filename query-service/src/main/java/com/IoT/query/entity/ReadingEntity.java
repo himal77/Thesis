@@ -16,7 +16,6 @@ import java.time.Instant;
 @NoArgsConstructor
 public class ReadingEntity {
 
-    // Getters & Setters
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -19,7 +19,7 @@ import java.util.Map;
  * REST API for querying sensor readings.
  * Consumed by Grafana dashboards during all 5 experiments.
  *
- * --- Thesis relevance (HPA) ---
+ * (HPA) ---
  * This service is mixed I/O + CPU bound:
  *   - I/O: PostgreSQL queries, especially range scans
  *   - CPU: aggregation queries (avgZScore, counts)

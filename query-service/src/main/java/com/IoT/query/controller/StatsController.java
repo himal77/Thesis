@@ -16,12 +16,11 @@ import java.util.Map;
  * Single endpoint that returns the full system overview.
  * This is what the main Grafana dashboard polls every 5 seconds.
  *
- * --- Thesis relevance (HPA) ---
+ * --- (HPA) ---
  * This endpoint does 4 DB queries per call.
  * Under concurrent Grafana polling it becomes CPU + I/O bound.
  * HPA scales this service when Grafana refresh rate is high
- * during peak experiment load — an interesting side effect to
- * document in the thesis.
+ * during peak experiment load — an interesting side effect.
  */
 @RestController
 @RequestMapping("/api/stats")
