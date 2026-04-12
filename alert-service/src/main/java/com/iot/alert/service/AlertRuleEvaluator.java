@@ -14,7 +14,7 @@ import java.util.Optional;
  * Evaluates whether a ProcessedReading should trigger an alert.
  *
  * Rules:
- *  1. Reading must be flagged as anomaly (|zScore| > 2.5)
+ *  1. Reading must be flagged as anomaly ()
  *  2. Device must have N consecutive anomalies (prevents noise spikes)
  *  3. Device must not be in cooldown (prevents alert flooding)
  */
@@ -35,37 +35,37 @@ public class AlertRuleEvaluator {
      * or empty if the reading is within normal parameters.
      */
     public Optional<AlertDto> evaluate(ProcessedReading reading) {
-        DeviceState state = stateManager.getOrCreate(
+        DeviceState deviceState = stateManager.getOrCreate(
                 reading.getSensorReading().getDeviceId()
         );
 
         // update history regardless
-        state.addReading(reading.getNormalized());
+        deviceState.addReading(reading.getSensorReading().getValue());
 
         if (!reading.isAnomaly()) {
             // normal reading — reset consecutive counter
-            state.resetConsecutiveAnomalies();
+            deviceState.resetConsecutiveAnomalies();
             return Optional.empty();
         }
 
         // anomalous reading — increment counter
-        state.incrementConsecutiveAnomalies();
+        deviceState.incrementConsecutiveAnomalies();
 
         // Rule 1: not enough consecutive anomalies yet
-        if (state.getConsecutiveAnomalies() < config.getConsecutiveThreshold()) {
+        if (deviceState.getConsecutiveAnomalies() < config.getConsecutiveThreshold()) {
             return Optional.empty();
         }
 
         // Rule 2: device is in cooldown
-        if (isInCooldown(state)) {
+        if (isInCooldown(deviceState)) {
             return Optional.empty();
         }
 
         // All rules passed — fire alert
-        state.setLastAlertAt(Instant.now());
-        state.resetConsecutiveAnomalies();
+        deviceState.setLastAlertAt(Instant.now());
+        deviceState.resetConsecutiveAnomalies();
 
-        return Optional.of(buildAlert(reading, state));
+        return Optional.of(buildAlert(reading, deviceState));
     }
 
     private boolean isInCooldown(DeviceState state) {

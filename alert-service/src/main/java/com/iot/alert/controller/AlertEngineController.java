@@ -19,7 +19,7 @@ import java.util.Optional;
  * Receives ProcessedReading from processor-service,
  * evaluates alert rules, persists fired alerts to PostgreSQL.
  *
- * --- Thesis relevance (VPA) ---
+ * (VPA) ---
  * This pod is NOT scaled by request rate or CPU.
  * It is scaled by MEMORY — which grows with fleet size via
  * DeviceStateManager. VPA watches container memory usage over
@@ -34,15 +34,15 @@ import java.util.Optional;
 public class AlertEngineController {
 
     private final AlertRuleEvaluator evaluator;
-    private final AlertRepository repository;
+    private final AlertRepository    repository;
     private final DeviceStateManager stateManager;
     private final Counter            evaluatedCounter;
     private final Counter            firedCounter;
 
     public AlertEngineController(AlertRuleEvaluator evaluator,
-                                 AlertRepository repository,
+                                 AlertRepository    repository,
                                  DeviceStateManager stateManager,
-                                 MeterRegistry registry) {
+                                 MeterRegistry      registry) {
         this.evaluator        = evaluator;
         this.repository       = repository;
         this.stateManager     = stateManager;

@@ -11,7 +11,7 @@ import java.util.Deque;
 /**
  * Holds runtime state for a single device.
  *
- * --- Thesis relevance (VPA) ---
+ * (VPA) ---
  * One DeviceState is allocated per unique deviceId seen.
  * Each instance holds:
  *   - a history ring buffer  (~200 doubles = ~1.6KB per device)
@@ -43,9 +43,9 @@ public class DeviceState {
         this.history    = new ArrayDeque<>(maxHistory);
     }
 
-    public void addReading(double normalized) {
+    public void addReading(double value) {
         if (history.size() >= maxHistory) history.pollFirst();
-        history.addLast(normalized);
+        history.addLast(value);
     }
 
     public void incrementConsecutiveAnomalies() { consecutiveAnomalies++; }
