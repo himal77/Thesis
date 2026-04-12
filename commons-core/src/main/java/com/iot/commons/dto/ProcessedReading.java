@@ -26,7 +26,6 @@ public class ProcessedReading {
     private SensorReading sensorReading;
     private double zScore;       // how many std devs from mean
     private String category;     // LOW / MEDIUM / HIGH / CRITICAL
-    private double normalized;   // value scaled between 0.0 and 1.0
     private boolean anomaly;      // true if |zScore| > 2.5
     private Instant processedAt;
 }

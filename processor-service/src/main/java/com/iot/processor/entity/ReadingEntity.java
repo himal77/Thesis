@@ -28,7 +28,6 @@ public class ReadingEntity {
 
     private double value;
     private double zScore;
-    private double normalized;
     private String category;
     private boolean anomaly;
     private Instant timestamp;

@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 public class AlertEngineClient {
 
     private static final Logger log = LoggerFactory.getLogger(AlertEngineClient.class);
+    public static final String API_EVALUATE_PATH = "/api/evaluate";
 
     private final RestTemplate    restTemplate;
     private final ProcessorConfig config;
@@ -29,12 +30,11 @@ public class AlertEngineClient {
     public void forward(ProcessedReading reading) {
         try {
             restTemplate.postForEntity(
-                    config.getAlertEngineUrl() + "/api/evaluate",
+                    config.getAlertEngineUrl() + API_EVALUATE_PATH,
                     reading,
                     Void.class
             );
         } catch (RestClientException e) {
-            // non-fatal — log and continue
             log.warn("Alert-engine unreachable for device {}: {}",
                     reading.getSensorReading().getDeviceId(), e.getMessage());
         }

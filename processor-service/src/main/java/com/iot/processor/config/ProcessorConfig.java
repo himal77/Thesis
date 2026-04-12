@@ -14,7 +14,7 @@ public class ProcessorConfig {
     private String alertEngineUrl;
 
     // Z-score threshold — reading is anomalous if |zScore| exceeds this
-    @Value("${processor.anomaly.threshold:2.5}")
+    @Value("${processor.anomaly.threshold:2.0}")
     private double anomalyThreshold;
 
     // How many past readings per device to keep in the sliding window

@@ -61,7 +61,7 @@ public class AnomalyDetector {
             zScore = stdDev == 0 ? 0.0 : (reading.getValue() - mean) / stdDev;
         }
 
-        // add to window, evict oldest if full
+        // add to window, remove the oldest value if queue is full
         if (window.size() >= config.getWindowSize()) {
             window.pollFirst();
         }
@@ -74,22 +74,16 @@ public class AnomalyDetector {
         return windows.size();
     }
 
-    public void clearDevice(String deviceId) {
-        windows.remove(deviceId);
-    }
-
-    // ── Private math ─────────────────────────────────────────────────────
-
     private double computeMean(Deque<Double> window) {
         double sum = 0.0;
-        for (double v : window) sum += v;
+        for (double value : window) sum += value;
         return sum / window.size();
     }
 
     private double computeStdDev(Deque<Double> window, double mean) {
         double sumSquaredDiffs = 0.0;
-        for (double v : window) {
-            double diff = v - mean;
+        for (double value : window) {
+            double diff = value - mean;
             sumSquaredDiffs += diff * diff;
         }
         return Math.sqrt(sumSquaredDiffs / window.size());

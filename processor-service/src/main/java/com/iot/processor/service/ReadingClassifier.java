@@ -13,8 +13,8 @@ public class ReadingClassifier {
         double abs = Math.abs(zScore);
         if      (abs >= 4.0) return "CRITICAL";
         else if (abs >= 3.0) return "HIGH";
-        else if (abs >= 2.5) return "MEDIUM";
-        else if (abs >= 1.5) return "LOW";
-        else                 return "NORMAL";
+        else if (abs >= 2.0) return "MEDIUM";
+        else if (abs >= 1.0) return "LOW";
+        else               return "NORMAL";
     }
 }
