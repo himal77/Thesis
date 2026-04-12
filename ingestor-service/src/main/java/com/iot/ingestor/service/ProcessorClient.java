@@ -2,11 +2,9 @@ package com.iot.ingestor.service;
 
 import com.iot.commons.dto.SensorReading;
 import com.iot.ingestor.config.IngestorConfig;
-import org.springframework.stereotype.Component;
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -26,8 +24,7 @@ import org.springframework.web.client.RestTemplate;
  *   - it creates measurable CPU pressure on the processor
  *   - both services scale independently via their own HPA
  *
- * In production you would batch these calls or use Kafka.
- * For the thesis, direct HTTP makes the scaling behavior
+ * direct HTTP makes the scaling behavior
  * more visible and easier to attribute.
  */
 @Component
@@ -47,10 +44,6 @@ public class ProcessorClient {
         this.metrics      = metrics;
     }
 
-    /**
-     * Forwards a single reading to processor-service.
-     * Returns true if successful, false if processor unreachable.
-     */
     public boolean forward(SensorReading reading) {
         try {
             metrics.forwardTimer.record(() ->

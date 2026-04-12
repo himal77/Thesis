@@ -10,18 +10,11 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class IngestorConfig {
 
-    // Processor service URL — overridden by K8s env var
-    @Value("${processor.url:http://localhost:8082}")
+    @Value("${processor.url}")
     private String processorUrl;
-
-    // Max batch size accepted per request
-    // Requests exceeding this are rejected with 500
-    @Value("${ingestor.max-batch-size:5000}")
-    private int maxBatchSize;
 
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
-
 }

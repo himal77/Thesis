@@ -4,13 +4,17 @@ import com.iot.commons.dto.SensorReading;
 import com.iot.ingestor.service.IngestorMetrics;
 import com.iot.ingestor.service.ProcessorClient;
 import com.iot.ingestor.config.IngestorConfig;
+import io.micrometer.common.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -22,7 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 3. Forward valid readings to processor-service one by one
  * 4. Return summary of what was accepted / rejected / failed
  * <p>
- * --- Thesis relevance (HPA) ---
+ *
  * This controller is the first scaling bottleneck in the pipeline.
  * <p>
  * Under GRADUAL_RAMP:
@@ -31,7 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * t=8m  → ~360 readings/batch  → CPU > 70%              → HPA fires
  * t=9m  → new pod ready        → CPU drops              → HPA stabilizes
  * <p>
- * This is the core HPA lag chart in Chapter 3 of the thesis.
+ * This is the core HPA lag chart
  */
 @RestController
 @RequestMapping("/api")
@@ -51,22 +55,11 @@ public class IngestorController {
         this.metrics = metrics;
     }
 
-    // ── POST /api/ingest ─────────────────────────────────────────────────
-
     @PostMapping("/ingest")
     public ResponseEntity<?> ingest(@RequestBody List<SensorReading> readings) {
-
-        // Reject oversized batches immediately
-        if (readings == null || readings.isEmpty()) {
+        if (CollectionUtils.isEmpty(readings)) {
             return ResponseEntity.badRequest()
                     .body(Map.of("error", "Batch must not be empty"));
-        }
-        if (readings.size() > config.getMaxBatchSize()) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of(
-                            "error", "Batch size " + readings.size() +
-                                    " exceeds max " + config.getMaxBatchSize()
-                    ));
         }
 
         metrics.receivedCounter.increment(readings.size());
@@ -79,14 +72,12 @@ public class IngestorController {
         metrics.batchProcessTimer.record(() -> {
             for (SensorReading reading : readings) {
 
-                // Step 1 — validate
                 if (!isValid(reading)) {
                     invalid.incrementAndGet();
                     metrics.invalidCounter.increment();
                     continue;
                 }
 
-                // Step 2 — forward to processor
                 boolean success = processorClient.forward(reading);
                 if (success) {
                     valid.incrementAndGet();
@@ -99,8 +90,6 @@ public class IngestorController {
         log.debug("Batch processed: total={} valid={} invalid={} failed={}",
                 readings.size(), valid.get(), invalid.get(), failed.get());
 
-        // Always return 202 Accepted — ingestor is non-blocking by design
-        // Failures are logged and counted in Prometheus, not surfaced to simulator
         return ResponseEntity.accepted().body(Map.of(
                 "received", readings.size(),
                 "forwarded", valid.get(),
@@ -109,48 +98,28 @@ public class IngestorController {
         ));
     }
 
-    // ── GET /api/health ──────────────────────────────────────────────────
-
-    @GetMapping("/health")
-    public ResponseEntity<?> health() {
-        return ResponseEntity.ok(Map.of(
-                "status", "UP",
-                "service", "ingestor-service",
-                "processorUrl", config.getProcessorUrl()
-        ));
-    }
-
-    // ── GET /api/stats ───────────────────────────────────────────────────
-
     @GetMapping("/stats")
     public ResponseEntity<?> stats() {
         return ResponseEntity.ok(Map.of(
-                "maxBatchSize", config.getMaxBatchSize(),
                 "processorUrl", config.getProcessorUrl(),
                 "status", "running",
-                "receivedCounter", metrics.receivedCounter,
-                "forwardedCounter", metrics.forwardedCounter,
-                "invalidCounter", metrics.invalidCounter,
-                "failedCounter", metrics.failedCounter,
-                "forwardTimer", metrics.forwardTimer,
-                "batchProcessTimer", metrics.batchProcessTimer
+                "receivedData", metrics.receivedCounter.count(),
+                "forwardedData", metrics.forwardedCounter.count(),
+                "invalidData", metrics.invalidCounter.count(),
+                "forwardFailedData", metrics.failedCounter.count(),
+                "averageForwardTime", metrics.forwardTimer.mean(TimeUnit.MICROSECONDS),
+                "averageBatchProcessTime", metrics.forwardTimer.mean(TimeUnit.MICROSECONDS)
         ));
     }
 
-    // ── Validation ───────────────────────────────────────────────────────
-
-    /**
-     * A reading is valid if it has:
-     * - a non-null deviceId
-     * - a non-null networkType
-     * - a non-null timestamp
-     * - a finite value (not NaN or Infinite)
-     */
     private boolean isValid(SensorReading reading) {
-        if (reading == null) return false;
-        if (reading.getDeviceId() == null || reading.getDeviceId().isBlank()) return false;
-        if (reading.getNetworkType() == null) return false;
-        if (reading.getTimestamp() == 0) return false;
+        if (ObjectUtils.isEmpty(reading)                    ||
+            StringUtils.isBlank(reading.getDeviceId())      ||
+            ObjectUtils.isEmpty(reading.getNetworkType())   ||
+            reading.getTimestamp() == 0) {
+            return false;
+        }
+
         return Double.isFinite(reading.getValue());
     }
 }
