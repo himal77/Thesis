@@ -68,13 +68,30 @@ services:
     image: himal77/processor-service:latest
     container_name: processor-service
     ports:
-      - "8080:8080"
+      - "${PROCESSOR_SERVICE_PORT}:8080"
     environment:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      SPRING_PROFILES_ACTIVE: test
     env_file:
-      - env/.env-test-processor-service
+      - .env
     depends_on:
       - config-server
+      - postgres
+
+  query-service:
+    image: himal77/query-service:latest
+    container_name: query-service
+    ports:
+      - "${QUERY_SERVICE_PORT}:8080"
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      SPRING_PROFILES_ACTIVE: test
+    env_file:
+      - .env
+    depends_on:
+      - config-server
+      - postgres
+      - processor-service
 
 
 networks:
