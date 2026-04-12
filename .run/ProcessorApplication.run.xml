@@ -1,0 +1,20 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="ProcessorApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <envs>
+      <env name="SPRING_APPLICATION_NAME" value="processor-service" />
+      <env name="SPRING_PROFILES_ACTIVE" value="dev" />
+      <env name="SPRING_CONFIG_IMPORT" value="configserver:http://localhost:8888" />
+    </envs>
+    <module name="processor" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.iot.processor.ProcessorApplication" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="com.iot.processor.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

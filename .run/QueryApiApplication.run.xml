@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="QueryApiApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <envs>
+      <env name="SPRING_APPLICATION_NAME" value="query-service" />
+      <env name="SPRING_PROFILES_ACTIVE" value="dev" />
+      <env name="SPRING_CONFIG_IMPORT" value="configserver:http://localhost:8888" />
+    </envs>
+    <module name="stimluation" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.IoT.query.QueryApiApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
