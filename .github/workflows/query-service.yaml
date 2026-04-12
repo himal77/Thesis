@@ -1,4 +1,4 @@
-name: Build & Push Processor Service
+name: Build & Push Query Service
 
 on:
   push:
