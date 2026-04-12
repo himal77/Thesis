@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 /**
  * All Prometheus metrics for ingestor-service in one place.
- *
  * --- Thesis relevance (HPA) ---
  * These metrics are what Grafana plots during Experiment 1.
  *
