@@ -1,7 +1,7 @@
-package com.iot.alert;
+package com.iot.alert.service;
 
+import com.iot.alert.entity.DeviceState;
 import com.iot.alert.config.AlertEngineConfig;
-import com.iot.alert.entity.AlertEntity;
 import com.iot.commons.dto.AlertDto;
 import com.iot.commons.dto.ProcessedReading;
 import org.springframework.stereotype.Component;

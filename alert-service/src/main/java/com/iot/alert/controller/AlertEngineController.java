@@ -2,8 +2,8 @@ package com.iot.alert.controller;
 
 import com.iot.alert.entity.AlertEntity;
 import com.iot.alert.repository.AlertRepository;
-import com.iot.alert.AlertRuleEvaluator;
-import com.iot.alert.DeviceStateManager;
+import com.iot.alert.service.AlertRuleEvaluator;
+import com.iot.alert.service.DeviceStateManager;
 import com.iot.commons.dto.AlertDto;
 import com.iot.commons.dto.ProcessedReading;
 import io.micrometer.core.instrument.Counter;

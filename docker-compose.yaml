@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   postgres:
     image: postgres:16
@@ -86,6 +84,7 @@ services:
     environment:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
       SPRING_PROFILES_ACTIVE: test
+      SPRING_APPLICATION_NAME: query-service
     env_file:
       - .env
     depends_on:
