@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: iot
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+
+    scrape_configs:
+      - job_name: 'ingestor-service'
+        metrics_path: '/actuator/prometheus'
+        static_configs:
+          - targets: ['ingestor-service:8080']
+
+      - job_name: 'processor-service'
+        metrics_path: '/actuator/prometheus'
+        static_configs:
+          - targets: ['processor-service:8080']
+
+      - job_name: 'alert-engine'
+        metrics_path: '/actuator/prometheus'
+        static_configs:
+          - targets: ['alert-engine:8080']
+
+      - job_name: 'query-api'
+        metrics_path: '/actuator/prometheus'
+        static_configs:
+          - targets: ['query-api:8080']
+
+      - job_name: 'device-simulator'
+        metrics_path: '/actuator/prometheus'
+        static_configs:
+          - targets: ['device-simulator:8080']
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: iot
+  labels:
+    app: prometheus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v2.51.2
+          args:
+            - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--storage.tsdb.path=/prometheus"
+            - "--web.enable-lifecycle"
+          ports:
+            - containerPort: 9090
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+          volumeMounts:
+            - name: prometheus-config
+              mountPath: /etc/prometheus
+            - name: prometheus-data
+              mountPath: /prometheus
+      volumes:
+        - name: prometheus-config
+          configMap:
+            name: prometheus-config
+        - name: prometheus-data
+          emptyDir: {}            # Replace with PVC for persistent metrics in prod
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: iot
+spec:
+  selector:
+    app: prometheus
+  ports:
+    - port: 9090
+      targetPort: 9090
+  type: ClusterIP

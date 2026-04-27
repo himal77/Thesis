@@ -1,0 +1,35 @@
+# ─────────────────────────────────────────────────────────────────────
+# VPA: alert-engine  (memory bound)
+#
+# VPA automatically right-sizes memory requests based on actual usage.
+# updateMode "Auto" will restart pods with updated resource requests
+# when they drift significantly from recommendations.
+#
+# ⚠️  PREREQUISITE: Install VPA CRDs first:
+#   kubectl apply -f https://github.com/kubernetes/autoscaler/releases/latest/download/vpa-v1.crd.yaml
+#
+# ⚠️  Start with updateMode: "Off" to observe recommendations without
+#   triggering restarts, then switch to "Auto" once you're comfortable.
+# ─────────────────────────────────────────────────────────────────────
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: alert-engine-vpa
+  namespace: iot
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: alert-engine
+  updatePolicy:
+    updateMode: "Auto"           # Change to "Off" first to just get recommendations
+  resourcePolicy:
+    containerPolicies:
+      - containerName: alert-engine
+        controlledResources:
+          - memory              # Only let VPA control memory — not CPU (to avoid HPA conflict)
+        minAllowed:
+          memory: "256Mi"       # Never go below this — Spring Boot needs headroom
+        maxAllowed:
+          memory: "2Gi"         # Cap to prevent runaway memory allocation
+        controlledValues: RequestsAndLimits

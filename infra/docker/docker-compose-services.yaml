@@ -39,8 +39,6 @@ services:
     networks:
       - iot-net
 
-
-
   query-service:
     image: himal77/query-service:latest
     container_name: query-service
