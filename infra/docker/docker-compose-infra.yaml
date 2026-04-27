@@ -12,6 +12,8 @@ services:
       SPRING_CLOUD_CONFIG_SERVER_GIT_FORCE_PULL: "true"
       SPRING_CLOUD_CONFIG_SERVER_GIT_SEARCH_PATHS: '{application}'
     restart: unless-stopped
+    networks:
+      - iot-net
 
   postgres:
     image: postgres:16
@@ -51,13 +53,9 @@ services:
     container_name: prometheus
     restart: unless-stopped
     command:
-      - |
-        envsubst < /etc/prometheus/prometheus.template.yml \
-                 > /etc/prometheus/prometheus.yml &&
-        prometheus \
-          --config.file=/etc/prometheus/prometheus.yml \
-          --storage.tsdb.path=/prometheus \
-          --web.enable-lifecycle           # allows POST /-/reload
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
     environment:
       - ENV=${ENV}
       - INGESTOR_HOST=${INGESTOR_HOST}
@@ -69,7 +67,7 @@ services:
       - QUERY_HOST=${QUERY_HOST}
       - QUERY_PORT=${QUERY_PORT}
     volumes:
-      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ../../observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
     ports:
       - "9090:9090"                        # http://localhost:9090

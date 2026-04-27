@@ -1,4 +1,18 @@
 services:
+  processor-service:
+    image: himal77/processor-service:latest
+    container_name: processor-service
+    ports:
+      - "${PROCESSOR_SERVICE_PORT}:8080"
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      SPRING_PROFILES_ACTIVE: test
+    env_file:
+      - ../env/.env.test
+    networks:
+      - iot-net
+
+
   alert-service:
     image: himal77/alert-service:latest
     container_name: alert-service
@@ -8,7 +22,7 @@ services:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
       SPRING_PROFILES_ACTIVE: test
     env_file:
-      - ../../.env
+      - ../env/.env.test
     networks:
       - iot-net
 
@@ -21,22 +35,11 @@ services:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
       SPRING_PROFILES_ACTIVE: test
     env_file:
-      - ../../.env
+      - ../env/.env.test
     networks:
       - iot-net
 
-  processor-service:
-    image: himal77/processor-service:latest
-    container_name: processor-service
-    ports:
-      - "${PROCESSOR_SERVICE_PORT}:8080"
-    environment:
-      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
-      SPRING_PROFILES_ACTIVE: test
-    env_file:
-      - ../../.env
-    networks:
-      - iot-net
+
 
   query-service:
     image: himal77/query-service:latest
@@ -48,7 +51,7 @@ services:
       SPRING_PROFILES_ACTIVE: test
       SPRING_APPLICATION_NAME: query-service
     env_file:
-      - ../../.env
+      - ../env/.env.test
     networks:
       - iot-net
 
