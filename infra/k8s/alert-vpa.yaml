@@ -1,0 +1,23 @@
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: alert-vpa
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: alert-service
+  updatePolicy:
+    updateMode: "Auto"       # VPA applies recommendations automatically
+  resourcePolicy:
+    containerPolicies:
+      - containerName: alert-service
+        minAllowed:
+          cpu: 100m
+          memory: 256Mi      # floor — never go below this
+        maxAllowed:
+          cpu: 1000m
+          memory: 1Gi        # ceiling — VPA won't exceed this
+        controlledResources:
+          - memory            # memory is what grows with device fleet
+          - cpu

@@ -1,0 +1,121 @@
+{
+  "title": "HPA & VPA Experiment",
+  "uid": "hpa-vpa-experiment",
+  "tags": ["thesis", "hpa", "vpa"],
+  "time": { "from": "now-30m", "to": "now" },
+  "refresh": "10s",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Locust — Requests/s to Stimulator",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 6 },
+      "targets": [
+        {
+          "expr": "sum(rate(locust_requests_total[1m]))",
+          "legendFormat": "requests/s"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "HPA — Processor Replica Count",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 6 },
+      "targets": [
+        {
+          "expr": "kube_horizontalpodautoscaler_status_current_replicas{horizontalpodautoscaler=\"processor-hpa\"}",
+          "legendFormat": "current replicas"
+        },
+        {
+          "expr": "kube_horizontalpodautoscaler_status_desired_replicas{horizontalpodautoscaler=\"processor-hpa\"}",
+          "legendFormat": "desired replicas"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "HPA — Processor CPU Utilization %",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 6, "w": 12, "h": 6 },
+      "targets": [
+        {
+          "expr": "sum(rate(container_cpu_usage_seconds_total{pod=~\"processor-service.*\", container!=\"\"}[1m])) by (pod) * 100",
+          "legendFormat": "{{pod}}"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "HPA — Scale Events (desired vs current lag)",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 6, "w": 12, "h": 6 },
+      "targets": [
+        {
+          "expr": "kube_horizontalpodautoscaler_status_desired_replicas{horizontalpodautoscaler=\"processor-hpa\"} - kube_horizontalpodautoscaler_status_current_replicas{horizontalpodautoscaler=\"processor-hpa\"}",
+          "legendFormat": "scaling lag (desired - current)"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "VPA — Alert Service Memory Usage vs Recommendation",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 12, "w": 12, "h": 6 },
+      "targets": [
+        {
+          "expr": "sum(container_memory_working_set_bytes{pod=~\"alert-service.*\", container!=\"\"}) by (pod)",
+          "legendFormat": "actual memory — {{pod}}"
+        },
+        {
+          "expr": "kube_verticalpodautoscaler_status_recommendation_containerrecommendations_target{verticalpodautoscaler=\"alert-vpa\", resource=\"memory\"}",
+          "legendFormat": "VPA target recommendation"
+        },
+        {
+          "expr": "kube_verticalpodautoscaler_status_recommendation_containerrecommendations_upperbound{verticalpodautoscaler=\"alert-vpa\", resource=\"memory\"}",
+          "legendFormat": "VPA upper bound"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "VPA — Alert Service CPU Recommendation",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 12, "w": 12, "h": 6 },
+      "targets": [
+        {
+          "expr": "kube_verticalpodautoscaler_status_recommendation_containerrecommendations_target{verticalpodautoscaler=\"alert-vpa\", resource=\"cpu\"}",
+          "legendFormat": "VPA CPU target"
+        },
+        {
+          "expr": "sum(rate(container_cpu_usage_seconds_total{pod=~\"alert-service.*\", container!=\"\"}[1m])) by (pod)",
+          "legendFormat": "actual CPU — {{pod}}"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Alert Service — Tracked Devices in Memory",
+      "type": "stat",
+      "gridPos": { "x": 0, "y": 18, "w": 6, "h": 4 },
+      "targets": [
+        {
+          "expr": "alert_tracked_devices_total",
+          "legendFormat": "devices in memory"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Processor — Active Pod Count",
+      "type": "stat",
+      "gridPos": { "x": 6, "y": 18, "w": 6, "h": 4 },
+      "targets": [
+        {
+          "expr": "kube_horizontalpodautoscaler_status_current_replicas{horizontalpodautoscaler=\"processor-hpa\"}",
+          "legendFormat": "pods"
+        }
+      ]
+    }
+  ]
+}

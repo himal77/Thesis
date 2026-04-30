@@ -2,11 +2,9 @@ package com.iot.devicesimulator.controller;
 
 import com.iot.commons.dto.SensorReading;
 import com.iot.commons.model.NetworkType;
-import com.iot.commons.model.TrafficProfile;
 import com.iot.devicesimulator.config.SimulatorConfig;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
-import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +15,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * REST API to control the simulator at runtime.
