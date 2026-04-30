@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: locust-worker
+  labels:
+    app: locust
+    role: worker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: locust
+      role: worker
+  template:
+    metadata:
+      labels:
+        app: locust
+        role: worker
+    spec:
+      containers:
+        - name: locust-worker
+          image: himal77/locust:latest
+          args:
+            - --worker
+            - --master-host=locust-master
+          env:
+            - name: BATCH_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  name: locust-config
+                  key: batch-size
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi

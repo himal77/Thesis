@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: locust-master
+  labels:
+    app: locust
+    role: master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: locust
+      role: master
+  template:
+    metadata:
+      labels:
+        app: locust
+        role: master
+    spec:
+      containers:
+        - name: locust-master
+          image: himal77/locust:latest
+          args:
+            - --master
+            - --host=$(LOCUST_HOST)
+          env:
+            - name: LOCUST_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: locust-config
+                  key: target-host
+            - name: BATCH_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  name: locust-config
+                  key: batch-size
+          ports:
+            - name: web-ui
+              containerPort: 8089
+            - name: worker-bind
+              containerPort: 5557
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: locust-master
+spec:
+  selector:
+    app: locust
+    role: master
+  ports:
+    - name: web-ui
+      port: 8089
+      targetPort: 8089
+    - name: worker-bind
+      port: 5557
+      targetPort: 5557

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: locust-config
+data:
+  target-host: "http://stimulator-service:8080"
+  batch-size: "10"

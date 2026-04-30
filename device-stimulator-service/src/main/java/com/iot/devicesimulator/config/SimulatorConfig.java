@@ -14,9 +14,6 @@ public class SimulatorConfig {
     @Value("${simulator.devices-per-network:10}")
     private int devicesPerNetwork;
 
-    @Value("${simulator.current-traffic-profile:HOLD}")
-    private TrafficProfile trafficProfile;
-
     @Value("${ingestor.url:http://localhost:8081}")
     private String ingestorUrl;
 

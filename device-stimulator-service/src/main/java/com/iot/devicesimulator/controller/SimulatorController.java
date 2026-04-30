@@ -1,13 +1,23 @@
 package com.iot.devicesimulator.controller;
 
+import com.iot.commons.dto.SensorReading;
+import com.iot.commons.model.NetworkType;
 import com.iot.commons.model.TrafficProfile;
-import com.iot.devicesimulator.config.TrafficRegistryFactory;
-import com.iot.devicesimulator.service.DeviceSimulator;
+import com.iot.devicesimulator.config.SimulatorConfig;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * REST API to control the simulator at runtime.
@@ -19,40 +29,56 @@ import java.util.Map;
 @RequestMapping("/api")
 public class SimulatorController {
 
-    private final DeviceSimulator deviceSimulator;
-    private final TrafficRegistryFactory trafficRegistryFactory;
+    private static final Logger log = LoggerFactory.getLogger(SimulatorController.class);
+    public static final String INGEST_API_PATH = "/api/ingest";
 
-    public SimulatorController(DeviceSimulator deviceSimulator,
-                               TrafficRegistryFactory trafficRegistryFactory) {
-        this.deviceSimulator = deviceSimulator;
-        this.trafficRegistryFactory = trafficRegistryFactory;
+    private final RestTemplate restTemplate;
+    private final SimulatorConfig config;
+    private final Counter sentCounter;
+    private final Counter errorCounter;
+
+    public SimulatorController(RestTemplate restTemplate,
+                               SimulatorConfig config,
+                               MeterRegistry registry) {
+        this.restTemplate = restTemplate;
+        this.config = config;
+        this.sentCounter = registry.counter("simulator.readings.sent");
+        this.errorCounter = registry.counter("simulator.readings.errors");
     }
 
     @GetMapping("/status")
     public ResponseEntity<?> status() {
-        return ResponseEntity.ok(Map.of(
-                "scenario", deviceSimulator.getTrafficProfile().get(),
-                "status", "running"
-        ));
+        return ResponseEntity.ok(Map.of("status", "running"));
     }
 
-    @PostMapping("/profile")
-    public ResponseEntity<?> setProfile(@RequestBody Map<String, String> body) {
-        // validate profile name before doing anything
-        TrafficProfile profile;
+    @GetMapping("/stimulate")
+    public void stimulate(@RequestParam int batchSize) {
+        List<SensorReading> batch = getTrafficInBatch(batchSize);
+        if(batch.isEmpty()) return;
+
+        sentCounter.increment(batch.size());
         try {
-            profile = TrafficProfile.valueOf(body.get("profile").toUpperCase());
-        } catch (IllegalArgumentException | NullPointerException e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "error", "Invalid profile. Valid values: " +
-                            Arrays.toString(TrafficProfile.values())
-            ));
+            restTemplate.postForEntity(
+                    config.getIngestorUrl() + INGEST_API_PATH,
+                    batch,
+                    Void.class
+            );
+            sentCounter.increment(batch.size());
+            log.debug("Emitted {} readings [batch={}]", batch.size(), batch);
+        } catch (RestClientException e) {
+            errorCounter.increment();
+            log.warn("Failed to send batch: {}", e.getMessage());
         }
+    }
 
-        trafficRegistryFactory.resetTimer();
-        trafficRegistryFactory.startTimer();
-        deviceSimulator.setTrafficProfile(profile);
-
-        return ResponseEntity.ok(Map.of("profile", profile.name()));
+    List<SensorReading> getTrafficInBatch(int batchSizePerNetwork) {
+        List<SensorReading> batch = new ArrayList<>();
+        for (NetworkType type : NetworkType.values()) {
+            int count = Math.max(1, batchSizePerNetwork);
+            for (int i = 0; i < count; i++) {
+                batch.add(SensorReading.random(type));
+            }
+        }
+        return batch;
     }
 }
