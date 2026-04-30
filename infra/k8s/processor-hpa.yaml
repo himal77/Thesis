@@ -2,6 +2,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: processor-hpa
+  namespace: iot
 spec:
   scaleTargetRef:
     apiVersion: apps/v1

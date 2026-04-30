@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stimulator-service
+  namespace: iot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stimulator-service
+  template:
+    metadata:
+      labels:
+        app: stimulator-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: "8080"
+    spec:
+      containers:
+        - name: stimulator-service
+          image: himal77/stimulator-service:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: INGESTOR_URL
+              value: "http://ingestor-service:8081"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stimulator-service
+  namespace: iot
+spec:
+  selector:
+    app: stimulator-service
+  ports:
+    - port: 8080
+      targetPort: 8080

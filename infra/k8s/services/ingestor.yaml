@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ingestor-service
+  namespace: iot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ingestor-service
+  template:
+    metadata:
+      labels:
+        app: ingestor-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: "8081"
+    spec:
+      containers:
+        - name: ingestor-service
+          image: himal77/ingestor-service:latest
+          ports:
+            - containerPort: 8081
+          env:
+            - name: PROCESSOR_SERVICE_URL
+              value: "http://processor-service:8082"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8081
+            initialDelaySeconds: 20
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingestor-service
+  namespace: iot
+spec:
+  selector:
+    app: ingestor-service
+  ports:
+    - port: 8081
+      targetPort: 8081
