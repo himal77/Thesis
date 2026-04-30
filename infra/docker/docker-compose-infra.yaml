@@ -1,20 +1,4 @@
 services:
-  config-server:
-    image: springcloud/configserver:latest
-    container_name: config-server
-    ports:
-      - "8888:8888"
-    environment:
-      SPRING_PROFILES_ACTIVE: git
-      SPRING_CLOUD_CONFIG_SERVER_GIT_URI: https://github.com/himal77/iot-config-repo
-      SPRING_CLOUD_CONFIG_SERVER_GIT_DEFAULT_LABEL: main
-      SPRING_CLOUD_CONFIG_SERVER_GIT_CLONE_ON_START: "true"
-      SPRING_CLOUD_CONFIG_SERVER_GIT_FORCE_PULL: "true"
-      SPRING_CLOUD_CONFIG_SERVER_GIT_SEARCH_PATHS: '{application}'
-    restart: unless-stopped
-    networks:
-      - iot-net
-
   postgres:
     image: postgres:16
     container_name: postgres_db
