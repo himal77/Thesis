@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -39,6 +41,8 @@ public class AlertEngineController {
     private final Counter            evaluatedCounter;
     private final Counter            firedCounter;
 
+    private final List<AlertEntity> alertEntityList = new ArrayList<>();
+
     public AlertEngineController(AlertRuleEvaluator evaluator,
                                  AlertRepository    repository,
                                  DeviceStateManager stateManager,
@@ -62,7 +66,9 @@ public class AlertEngineController {
 
         alert.ifPresent(a -> {
             firedCounter.increment();
-            repository.save(toEntity(a));
+            AlertEntity alertEntity = toEntity(a);
+            repository.save(alertEntity);
+            alertEntityList.add(alertEntity);
         });
 
         return ResponseEntity.ok(Map.of(
@@ -80,7 +86,6 @@ public class AlertEngineController {
     public ResponseEntity<?> stats() {
         return ResponseEntity.ok(Map.of(
                 "trackedDevices",      stateManager.getTrackedDeviceCount(),
-                "estimatedMemoryBytes",stateManager.estimatedMemoryBytes(),
                 "alertsLast1h",        repository.countByTriggeredAtAfter(
                         Instant.now().minusSeconds(3600)),
                 "status",              "running"

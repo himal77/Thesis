@@ -1,5 +1,6 @@
 package com.iot.alert.entity;
 
+import com.iot.commons.dto.SensorReading;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,7 +33,7 @@ import java.util.Deque;
 public class DeviceState {
 
     private final String        deviceId;
-    private final Deque<Double> history;
+    private final Deque<SensorReading> history;
     private final int           maxHistory;
     private int                 consecutiveAnomalies = 0;
     private Instant             lastAlertAt          = null;
@@ -43,9 +44,9 @@ public class DeviceState {
         this.history    = new ArrayDeque<>();
     }
 
-    public void addReading(double value) {
+    public void addReading(SensorReading sensorReading) {
         if (history.size() >= maxHistory) history.pollFirst();
-        history.addLast(value);
+        history.addLast(sensorReading);
     }
 
     public void incrementConsecutiveAnomalies() { consecutiveAnomalies++; }

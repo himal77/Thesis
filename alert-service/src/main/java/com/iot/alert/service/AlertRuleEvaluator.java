@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -23,6 +25,7 @@ public class AlertRuleEvaluator {
 
     private final AlertEngineConfig config;
     private final DeviceStateManager stateManager;
+    private final List<ProcessedReading> processedReadingList = new ArrayList<>();
 
     public AlertRuleEvaluator(AlertEngineConfig config,
                               DeviceStateManager stateManager) {
@@ -35,12 +38,14 @@ public class AlertRuleEvaluator {
      * or empty if the reading is within normal parameters.
      */
     public Optional<AlertDto> evaluate(ProcessedReading reading) {
+        processedReadingList.add(reading);
+
         DeviceState deviceState = stateManager.getOrCreate(
                 reading.getSensorReading().getDeviceId()
         );
 
         // update history regardless
-        deviceState.addReading(reading.getSensorReading().getValue());
+        deviceState.addReading(reading.getSensorReading());
 
         if (!reading.isAnomaly()) {
             // normal reading — reset consecutive counter
@@ -65,7 +70,7 @@ public class AlertRuleEvaluator {
         deviceState.setLastAlertAt(Instant.now());
         deviceState.resetConsecutiveAnomalies();
 
-        return Optional.of(buildAlert(reading, deviceState));
+        return Optional.of(buildAlert(reading));
     }
 
     private boolean isInCooldown(DeviceState state) {
@@ -76,7 +81,7 @@ public class AlertRuleEvaluator {
         return secondsSinceLast < config.getCooldownSeconds();
     }
 
-    private AlertDto buildAlert(ProcessedReading reading, DeviceState state) {
+    private AlertDto buildAlert(ProcessedReading reading) {
         String message = String.format(
                 "Device %s reported %s readings with |zScore|=%.2f",
                 reading.getSensorReading().getDeviceId(),

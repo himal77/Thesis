@@ -4,6 +4,8 @@ import com.iot.alert.entity.DeviceState;
 import com.iot.alert.config.AlertEngineConfig;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class DeviceStateManager {
 
+    private final List<DeviceState> deviceStateList = new ArrayList<>();
     private final Map<String, DeviceState> states = new ConcurrentHashMap<>();
     private final AlertEngineConfig config;
 
@@ -41,20 +44,5 @@ public class DeviceStateManager {
 
     public int getTrackedDeviceCount() {
         return states.size();
-    }
-
-    // Estimated memory footprint in bytes
-    // Used by /api/stats endpoint — visible in Grafana during VPA experiment
-    public long estimatedMemoryBytes() {
-        // each DeviceState ≈ historySize * 8 bytes (doubles) + overhead
-        return (long) states.size() * 8;
-    }
-
-    public void remove(String deviceId) {
-        states.remove(deviceId);
-    }
-
-    public void clear() {
-        states.clear();
     }
 }
