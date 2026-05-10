@@ -26,6 +26,7 @@ public class AlertRuleEvaluator {
     private final AlertEngineConfig config;
     private final DeviceStateManager stateManager;
     private final List<ProcessedReading> processedReadingList = new ArrayList<>();
+    private final List<AlertDto> alertDtoList = new ArrayList<>();
 
     public AlertRuleEvaluator(AlertEngineConfig config,
                               DeviceStateManager stateManager) {
@@ -70,7 +71,9 @@ public class AlertRuleEvaluator {
         deviceState.setLastAlertAt(Instant.now());
         deviceState.resetConsecutiveAnomalies();
 
-        return Optional.of(buildAlert(reading));
+        AlertDto alertDto = buildAlert(reading);
+        alertDtoList.add(alertDto);
+        return Optional.of(alertDto);
     }
 
     private boolean isInCooldown(DeviceState state) {
