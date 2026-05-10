@@ -40,7 +40,7 @@ public class DeviceState {
     public DeviceState(String deviceId, int maxHistory) {
         this.deviceId   = deviceId;
         this.maxHistory = maxHistory;
-        this.history    = new ArrayDeque<>(maxHistory);
+        this.history    = new ArrayDeque<>();
     }
 
     public void addReading(double value) {
