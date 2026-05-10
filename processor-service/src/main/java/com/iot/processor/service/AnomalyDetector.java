@@ -48,6 +48,12 @@ public class AnomalyDetector {
      * Returns 0.0 if the device has fewer than 2 readings (no baseline yet).
      */
     public double computeZScore(SensorReading reading) {
+
+        // if unnecessary expected value, the direct critical
+        if (reading.getValue() > 120.0 || reading.getValue() < 1.0) {
+            return 4.0;
+        }
+
         Deque<Double> window = windows.computeIfAbsent(
                 reading.getDeviceId(),
                 id -> new ArrayDeque<>(config.getWindowSize())
