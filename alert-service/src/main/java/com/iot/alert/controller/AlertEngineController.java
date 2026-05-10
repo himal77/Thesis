@@ -76,7 +76,7 @@ public class AlertEngineController {
      * estimatedMemoryBytes is the key metric for the VPA experiment:
      * as fleet grows, this number climbs and VPA should track it.
      */
-    @GetMapping("/stats")
+    @GetMapping("/alerts/stats")
     public ResponseEntity<?> stats() {
         return ResponseEntity.ok(Map.of(
                 "trackedDevices",      stateManager.getTrackedDeviceCount(),

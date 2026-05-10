@@ -47,7 +47,7 @@ public class DeviceStateManager {
     // Used by /api/stats endpoint — visible in Grafana during VPA experiment
     public long estimatedMemoryBytes() {
         // each DeviceState ≈ historySize * 8 bytes (doubles) + overhead
-        return (long) states.size() * config.getHistorySize() * 8;
+        return (long) states.size() * 8;
     }
 
     public void remove(String deviceId) {
